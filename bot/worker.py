@@ -70,7 +70,7 @@ async def dl_link(event):
             [Button.inline("CANCEL", data=f"skip{wah}")],
         ],
     )
-        cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
+    cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
     process = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
@@ -78,13 +78,14 @@ async def dl_link(event):
     
     # Check if FFmpeg exited successfully
     if process.returncode != 0:
-        await e.edit("**ERROR:** FFmpeg failed to compress the video.")
+        await xxx.edit("**ERROR:** FFmpeg failed to compress the video.")
         WORKING.clear()
         if os.path.exists(dl):
             os.remove(dl)
         if os.path.exists(out):
             os.remove(out)
         return
+        
     ees = dt.now()
     ttt = time.time()
     await nn.delete()
@@ -110,15 +111,12 @@ async def dl_link(event):
     a1 = await info(dl, xxx)
     a2 = await info(out, xxx)
     dk = f"<b>File Name:</b> {newFile}\n\n<b>Original File Size:</b> {hbs(org)}\n<b>Encoded File Size:</b> {hbs(com)}\n<b>Encoded Percentage:</b> {per}\n\n<b>Get Mediainfo Here:</b> <a href='{a1}'>Before</a>/<a href='{a2}'>After</a>\n\n<i>Downloaded in {x}\nEncoded in {xx}\nUploaded in {xxx}</i>"
-    ds = await e.client.send_file(
-        e.chat_id, file=ok, force_document=True, caption=dk, link_preview=False, thumb=thum, parse_mode="html"
+    ds = await event.client.send_file(
+        event.chat_id, file=ok, force_document=True, caption=dk, link_preview=False, thumb=thum, parse_mode="html"
     )
     os.remove(dl)
     os.remove(out)
     WORKING.clear()
-
-
-
 
 
 async def encod(event):
@@ -211,21 +209,22 @@ async def encod(event):
                 [Button.inline("CANCEL", data=f"skip{wah}")],
             ],
         )
-            cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
-    process = await asyncio.create_subprocess_shell(
-        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    await process.communicate()
-    
-    # Check if FFmpeg exited successfully
-    if process.returncode != 0:
-        await e.edit("**ERROR:** FFmpeg failed to compress the video.")
-        WORKING.clear()
-        if os.path.exists(dl):
-            os.remove(dl)
-        if os.path.exists(out):
-            os.remove(out)
-        return
+        cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
+        process = await asyncio.create_subprocess_shell(
+            cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+        await process.communicate()
+        
+        # Check if FFmpeg exited successfully
+        if process.returncode != 0:
+            await e.edit("**ERROR:** FFmpeg failed to compress the video.")
+            WORKING.clear()
+            if os.path.exists(dl):
+                os.remove(dl)
+            if os.path.exists(out):
+                os.remove(out)
+            return
+            
         ees = dt.now()
         ttt = time.time()
         await nn.delete()
