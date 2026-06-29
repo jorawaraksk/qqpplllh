@@ -70,20 +70,21 @@ async def dl_link(event):
             [Button.inline("CANCEL", data=f"skip{wah}")],
         ],
     )
-    cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
+        cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
     process = await asyncio.create_subprocess_shell(
         cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
-    stdout, stderr = await process.communicate()
-    er = stderr.decode()
-    try:
-        if er:
-            await xxx.edit(str(er) + "\n\n**ERROR**")
-            WORKING.clear()
+    await process.communicate()
+    
+    # Check if FFmpeg exited successfully
+    if process.returncode != 0:
+        await e.edit("**ERROR:** FFmpeg failed to compress the video.")
+        WORKING.clear()
+        if os.path.exists(dl):
             os.remove(dl)
-            return os.remove(out)
-    except BaseException:
-        pass
+        if os.path.exists(out):
+            os.remove(out)
+        return
     ees = dt.now()
     ttt = time.time()
     await nn.delete()
@@ -210,20 +211,21 @@ async def encod(event):
                 [Button.inline("CANCEL", data=f"skip{wah}")],
             ],
         )
-        cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
-        process = await asyncio.create_subprocess_shell(
-            cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        er = stderr.decode()
-        try:
-            if er:
-                await e.edit(str(er) + "\n\n**ERROR**")
-                WORKING.clear()
-                os.remove(dl)
-                return os.remove(out)
-        except BaseException:
-            pass
+            cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
+    process = await asyncio.create_subprocess_shell(
+        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    await process.communicate()
+    
+    # Check if FFmpeg exited successfully
+    if process.returncode != 0:
+        await e.edit("**ERROR:** FFmpeg failed to compress the video.")
+        WORKING.clear()
+        if os.path.exists(dl):
+            os.remove(dl)
+        if os.path.exists(out):
+            os.remove(out)
+        return
         ees = dt.now()
         ttt = time.time()
         await nn.delete()
