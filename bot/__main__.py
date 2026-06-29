@@ -187,13 +187,22 @@ async def something():
                     LOGS.info(r)
                     WORKING.clear()
                     QUEUE.pop(list(QUEUE.keys())[0])
+                    continue
                 es = dt.now()
                 kk = dl.split("/")[-1]
-                aa = kk.split(".")[-1]
+                
+                # --- FIXED FILENAME LOGIC ---
+                safe_name = kk.replace("|", "_").replace(" ", "_")
+                if "." in safe_name:
+                    bb = safe_name.rsplit(".", 1)[0] + ".mkv"
+                else:
+                    bb = safe_name + ".mkv"
+                
                 newFile = dl.replace(f"downloads/", "").replace(f"_", " ")
                 rr = "encode"
-                bb = kk.replace(f".{aa}", ".mkv")
                 out = f"{rr}/{bb}"
+                # ----------------------------
+                
                 thum = "thumb.jpg"
                 dtime = ts(int((es - s).seconds) * 1000)
                 hehe = f"{out};{dl};{list(QUEUE.keys())[0]}"
@@ -205,21 +214,25 @@ async def something():
                         [Button.inline("CANCEL", data=f"skip{wah}")],
                     ],
                 )
+                
+                # --- FIXED FFMPEG LOGIC ---
                 cmd = f"""ffmpeg -i "{dl}" {ffmpegcode[0]} "{out}" -y"""
                 process = await asyncio.create_subprocess_shell(
                     cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
                 )
-                stdout, stderr = await process.communicate()
-                er = stderr.decode()
-                try:
-                    if er:
-                        await e.edit(str(er) + "\n\n**ERROR**")
+                await process.communicate()
+                
+                if process.returncode != 0:
+                    await e.edit("**ERROR:** FFmpeg failed to compress the queued video.")
+                    if list(QUEUE.keys()):
                         QUEUE.pop(list(QUEUE.keys())[0])
+                    if os.path.exists(dl):
                         os.remove(dl)
+                    if os.path.exists(out):
                         os.remove(out)
-                        continue
-                except BaseException:
-                    pass
+                    continue
+                # --------------------------
+                
                 ees = dt.now()
                 ttt = time.time()
                 await nn.delete()
@@ -248,7 +261,9 @@ async def something():
                 ds = await e.client.send_file(
                     e.chat_id, file=ok, force_document=True, caption=dk, link_preview=False, thumb=thum, parse_mode="html"
                 )
-                QUEUE.pop(list(QUEUE.keys())[0])
+                
+                if list(QUEUE.keys()):
+                    QUEUE.pop(list(QUEUE.keys())[0])
                 os.remove(dl)
                 os.remove(out)
             else:
