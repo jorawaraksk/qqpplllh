@@ -2,6 +2,7 @@
 #    Copyright (c) 2021 Danish_00
 #    Script Improved by Anshusharma
 
+import re
 from .FastTelethon import download_file, upload_file
 from .funcn import *
 from .config import *
@@ -33,6 +34,9 @@ async def dl_link(event):
     try:
         link = event.text.split()[1]
         name = event.text.split()[2]
+        if name:
+            # Download se pehle link wale name ko clean karne ke liye
+            name = re.sub(r'[\\/*?:"<>| ]', "_", name)
     except BaseException:
         pass
     if not link:
@@ -51,7 +55,10 @@ async def dl_link(event):
         return
     es = dt.now()
     kk = dl.split("/")[-1]
-    safe_name = kk.replace("|", "_").replace(" ", "_")
+    
+    # Saare symbols aur spaces ko ek sath replace karne ke liye regex fix
+    safe_name = re.sub(r'[\\/*?:"<>| ]', "_", kk)
+    
     if "." in safe_name:
             bb = safe_name.rsplit(".", 1)[0] + ".mkv"
     else:
@@ -144,6 +151,10 @@ async def encod(event):
             name = event.file.name
             if not name:
                 name = "video_" + dt.now().isoformat("_", "seconds") + ".mp4"
+            
+            # Queue me add karne se pehle name clean karne ke liye
+            name = re.sub(r'[\\/*?:"<>| ]', "_", name)
+            
             QUEUE.update({doc.id: [name, doc]})
             return await xxx.edit(
                 "**Added This File in Queue**"
@@ -159,6 +170,10 @@ async def encod(event):
                 filename = event.file.name
                 if not filename:
                     filename = "video_" + dt.now().isoformat("_", "seconds") + ".mp4"
+                
+                # File open/write hone se pehle slash aur symbols hatane ke liye fix
+                filename = re.sub(r'[\\/*?:"<>| ]', "_", filename)
+                
                 dl = dir + filename
                 with open(dl, "wb") as f:
                     ok = await download_file(
@@ -189,7 +204,10 @@ async def encod(event):
             return os.remove(dl)
         es = dt.now()
         kk = dl.split("/")[-1]
-        safe_name = kk.replace("|", "_").replace(" ", "_")
+        
+        # Safe name generation area me replacement fix
+        safe_name = re.sub(r'[\\/*?:"<>| ]', "_", kk)
+        
         if "." in safe_name:
             bb = safe_name.rsplit(".", 1)[0] + ".mkv"
         else:
@@ -259,3 +277,4 @@ async def encod(event):
     except BaseException as er:
         LOGS.info(er)
         WORKING.clear()
+
